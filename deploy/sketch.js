@@ -36,7 +36,7 @@ async function make() {
 
 function loadBrain() {
   let options = {
-    inputs: 136,
+    inputs: 74,
     outputs: 2,
     task: "classification"
   };
@@ -56,14 +56,27 @@ function brainLoaded() {
 }
 
 function classifyFace(inputs) {
-  console.log({ inputs });
   brain.classify(inputs, gotResult);
 }
 
 function gotResult(err, result) {
   if (err) return console.error(err);
 
-  console.log(result);
+  if (result) {
+    let normal, open;
+    if (result[0].label === "normal") {
+      normal = result[0];
+      open = result[1];
+    } else {
+      normal = result[1];
+      open = result[0];
+    }
+    if (normal.confidence > open.confidence) {
+      console.log("normal face");
+      return;
+    }
+    console.log("open mouth");
+  }
 }
 
 function toggleDataCollection() {
@@ -104,12 +117,19 @@ function gotFace(err, result) {
       drawLandmarks(detections);
 
       const {
-        landmarks: { positions }
+        parts: { mouth, jawOutline }
       } = detections[0];
 
       const inputs = [];
-      positions.forEach(position => {
-        const { _x, _y } = position;
+
+      mouth.forEach(point => {
+        const { _x, _y } = point;
+        inputs.push(_x);
+        inputs.push(_y);
+      });
+
+      jawOutline.forEach(point => {
+        const { _x, _y } = point;
         inputs.push(_x);
         inputs.push(_y);
       });

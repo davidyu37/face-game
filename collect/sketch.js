@@ -8,7 +8,7 @@ let collecting = false;
 let data = [];
 let collectBtn = null;
 let brain = null;
-let label = "raisedbrow";
+let label = "open";
 let labelBtn = null;
 
 // relative path to your models from window.location.pathname
@@ -33,7 +33,7 @@ async function make() {
 
 function loadBrain() {
   let options = {
-    inputs: 136,
+    inputs: 74,
     outputs: 2,
     task: "classification"
   };
@@ -57,13 +57,13 @@ function addButton(id, action) {
 }
 
 function toggleLabel() {
-  if (label === "raisedbrow") {
+  if (label === "open") {
     label = "normal";
     labelBtn.innerText = "Normal";
     return;
   }
-  label = "raisedbrow";
-  labelBtn.innerText = "Raised";
+  label = "open";
+  labelBtn.innerText = "Open";
 }
 
 function toggleDataCollection() {
@@ -91,11 +91,8 @@ function gotResults(err, result) {
   }
 
   if (collecting && result[0]) {
-    console.log(result[0]);
-    const {
-      landmarks: { positions }
-    } = result[0];
-    recordData(positions);
+    const { parts } = result[0];
+    recordData(parts);
   }
 
   detections = result;
@@ -115,34 +112,25 @@ function gotResults(err, result) {
   faceapi.detect(gotResults);
 }
 
-function recordData(positions) {
-  console.log(positions);
+function recordData(parts) {
+  const { mouth, jawOutline } = parts;
   const inputs = [];
-  positions.forEach(position => {
-    const { _x, _y } = position;
+
+  mouth.forEach(point => {
+    const { _x, _y } = point;
     inputs.push(_x);
     inputs.push(_y);
   });
 
+  jawOutline.forEach(point => {
+    const { _x, _y } = point;
+    inputs.push(_x);
+    inputs.push(_y);
+  });
+
+  console.log(inputs);
+
   brain.addData(inputs, [label]);
-
-  // const rightEyeBrow = parts.rightEyeBrow;
-  // const leftEyeBrow = parts.leftEyeBrow;
-  // const inputs = [];
-
-  // rightEyeBrow.forEach(point => {
-  //   const { x, y } = point;
-  //   inputs.push(x);
-  //   inputs.push(y);
-  // });
-
-  // leftEyeBrow.forEach(point => {
-  //   const { x, y } = point;
-  //   inputs.push(x);
-  //   inputs.push(y);
-  // });
-
-  // brain.addData(inputs, [label]);
 }
 
 function drawBox(detections) {
@@ -169,6 +157,7 @@ function drawLandmarks(detections) {
     const rightEye = detections[i].parts.rightEye;
     const rightEyeBrow = detections[i].parts.rightEyeBrow;
     const leftEyeBrow = detections[i].parts.leftEyeBrow;
+    const jawOutline = detections[i].parts.jawOutline;
 
     drawPart(mouth, true);
     drawPart(nose, false);
@@ -176,6 +165,7 @@ function drawLandmarks(detections) {
     drawPart(leftEyeBrow, false);
     drawPart(rightEye, true);
     drawPart(rightEyeBrow, false);
+    drawPart(jawOutline, false);
   }
 }
 

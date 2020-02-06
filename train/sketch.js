@@ -3,13 +3,13 @@ let brain;
 function setup() {
   createCanvas(640, 480);
   let options = {
-    inputs: 136,
+    inputs: 74,
     outputs: 2,
     task: "classification",
     debug: true
   };
   brain = ml5.neuralNetwork(options);
-  brain.loadData("raisedbrow1.json", dataReady);
+  brain.loadData("openmouth.json", dataReady);
 }
 
 function dataReady() {
