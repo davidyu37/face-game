@@ -17,9 +17,9 @@ const detection_options = {
 };
 
 const custom_model = {
-  model: "model.json",
-  metadata: "model_meta.json",
-  weights: "model.weights.bin"
+  model: "model_v2.json",
+  metadata: "model_meta_v2.json",
+  weights: "model.weights_v2.bin"
 };
 
 async function make() {

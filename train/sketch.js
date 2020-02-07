@@ -9,7 +9,7 @@ function setup() {
     debug: true
   };
   brain = ml5.neuralNetwork(options);
-  brain.loadData("openmouth.json", dataReady);
+  brain.loadData("openmouth1.json", dataReady);
 }
 
 function dataReady() {
